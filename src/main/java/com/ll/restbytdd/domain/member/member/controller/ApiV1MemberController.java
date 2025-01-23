@@ -4,24 +4,24 @@ import com.ll.restbytdd.domain.member.member.dto.MemberDto;
 import com.ll.restbytdd.domain.member.member.entity.Member;
 import com.ll.restbytdd.domain.member.member.service.MemberService;
 import com.ll.restbytdd.global.exceptions.ServiceException;
+import com.ll.restbytdd.global.rq.Rq;
 import com.ll.restbytdd.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 public class ApiV1MemberController {
     private final MemberService memberService;
+    private final Rq rq;
 
     record MemberJoinReqBody(
             String username,
             String password,
             String nickname
-    ){}
+    ) {
+    }
 
     @PostMapping("/join")
     public RsData<MemberDto> join(@RequestBody MemberJoinReqBody reqBody) {
@@ -39,12 +39,14 @@ public class ApiV1MemberController {
             String username,
             String password,
             String nickname
-    ){}
+    ) {
+    }
 
     record MemberLoginResBody(
             MemberDto item,
             String apiKey
-    ){}
+    ) {
+    }
 
     @PostMapping("/login")
     public RsData<MemberLoginResBody> login(@RequestBody MemberLoginReqBody reqBody) {
@@ -64,5 +66,13 @@ public class ApiV1MemberController {
                         member.getApiKey()
                 )
         );
+    }
+
+
+    @GetMapping("/me")
+    public MemberDto me() {
+        Member member = rq.checkAuthentication();
+
+        return new MemberDto(member);
     }
 }
