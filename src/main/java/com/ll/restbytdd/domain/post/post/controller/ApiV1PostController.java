@@ -3,7 +3,6 @@ package com.ll.restbytdd.domain.post.post.controller;
 import com.ll.restbytdd.domain.member.member.entity.Member;
 import com.ll.restbytdd.domain.post.post.dto.PostDto;
 import com.ll.restbytdd.domain.post.post.entity.Post;
-import com.ll.restbytdd.domain.post.post.repository.PostRepository;
 import com.ll.restbytdd.domain.post.post.service.PostService;
 import com.ll.restbytdd.global.rq.Rq;
 import com.ll.restbytdd.global.rsData.RsData;
@@ -81,5 +80,20 @@ public class ApiV1PostController {
         );
     }
 
-    private final PostRepository postRepository;
+
+    @DeleteMapping("/{id}")
+    public RsData<Void> delete(@PathVariable long id) {
+        Member actor = rq.checkAuthentication();
+
+        Post post = postService.findById(id).get();
+
+        post.checkActorCanDelete(actor);
+
+        postService.delete(post);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 글이 삭제되었습니다.".formatted(post.getId())
+        );
+    }
 }

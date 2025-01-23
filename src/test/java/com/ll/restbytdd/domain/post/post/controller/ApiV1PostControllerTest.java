@@ -303,4 +303,27 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.msg").value("작성자만 글을 수정할 권한이 있습니다."))
         ;
     }
+
+    @Test
+    @DisplayName("글 삭제")
+    void t10() throws Exception {
+        Member actor = memberService.findByUsername("user2").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/api/v1/posts/1")
+                                .header("Authorization", "Bearer " + actor.getApiKey())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("1번 글이 삭제되었습니다."))
+        ;
+
+        assertThat(postService.findById(1)).isEmpty();
+    }
 }
