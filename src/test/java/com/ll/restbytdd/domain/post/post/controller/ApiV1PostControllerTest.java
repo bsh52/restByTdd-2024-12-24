@@ -199,7 +199,6 @@ public class ApiV1PostControllerTest {
                 )
                 .andDo(print());
 
-
         resultActions
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("modify"))
@@ -238,7 +237,6 @@ public class ApiV1PostControllerTest {
                 )
                 .andDo(print());
 
-
         resultActions
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("modify"))
@@ -250,6 +248,31 @@ public class ApiV1PostControllerTest {
                         title-Length-length must be between 2 and 100
                         title-NotBlank-must not be blank
                         """.stripIndent().trim()))
+        ;
+    }
+
+    @Test
+    @DisplayName("글 수정 with no actor")
+    void t8() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/posts/1")
+                                .content("""
+                                        {
+                                            "title": "축구 하실 분 계신가요?",
+                                            "content": "14시 까지 22명을 모아야 진행이 됩니다."
+                                        }
+                                        """.stripIndent())
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("apiKey를 입력해주세요."))
         ;
     }
 }
