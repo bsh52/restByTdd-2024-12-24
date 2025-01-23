@@ -118,4 +118,62 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.data.content").value(post.getContent()))
         ;
     }
+
+    @Test
+    @DisplayName("글 작성, with no input")
+    void t4() throws Exception {
+        Member actor = memberService.findByUsername("user1").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .header("Authorization", "Bearer " + actor.getApiKey())
+                                .content("""
+                                        {
+                                            "title": "",
+                                            "content": ""
+                                        }
+                                        """.stripIndent())
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("400-1"))
+                .andExpect(jsonPath("$.msg").value("""
+                        content-Length-length must be between 2 and 10000000
+                        content-NotBlank-must not be blank
+                        title-Length-length must be between 2 and 100
+                        title-NotBlank-must not be blank
+                        """.stripIndent().trim()))
+        ;
+    }
+
+    @Test
+    @DisplayName("글 작성, with no actor")
+    void t5() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .content("""
+                                        {
+                                            "title": "제목 new",
+                                            "content": "내용 new"
+                                        }
+                                        """.stripIndent())
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("apiKey를 입력해주세요."))
+        ;
+    }
 }

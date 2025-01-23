@@ -25,7 +25,7 @@ public class Rq {
         String apiKey = credentials == null ? "" : credentials.substring("Bearer ".length());
 
         if (Ut.str.isBlank(apiKey)) {
-            throw new ServiceException("401-1", "api key가 필요합니다.");
+            throw new ServiceException("401-1", "apiKey를 입력해주세요.");
         }
         Optional<Member> opActor = memberService.findByApiKey(apiKey);
 
