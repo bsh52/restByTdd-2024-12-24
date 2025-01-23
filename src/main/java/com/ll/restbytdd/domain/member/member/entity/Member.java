@@ -31,5 +31,9 @@ public class Member extends BaseTime {
     public boolean isAdmin() {
         return true;
     }
+
+    public boolean matchPassword(String password) {
+        return this.password.equals(password);
+    }
 }
 
