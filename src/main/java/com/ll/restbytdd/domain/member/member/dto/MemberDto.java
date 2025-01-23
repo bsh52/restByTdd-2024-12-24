@@ -1,6 +1,5 @@
 package com.ll.restbytdd.domain.member.member.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ll.restbytdd.domain.member.member.entity.Member;
 import lombok.Getter;
 
@@ -11,10 +10,8 @@ import java.time.LocalDateTime;
 public class MemberDto {
     private long id;
 
-    @JsonProperty("createdDatetime")
     private LocalDateTime createDate;
 
-    @JsonProperty("modifiedDatetime")
     private LocalDateTime modifyDate;
 
     private String nickname;

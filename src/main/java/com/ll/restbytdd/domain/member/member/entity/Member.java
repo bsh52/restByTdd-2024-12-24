@@ -25,7 +25,7 @@ public class Member extends BaseTime {
     private String apiKey;
 
     public String getName() {
-        return this.nickname;
+        return nickname;
     }
 
     public boolean isAdmin() {
