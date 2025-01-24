@@ -299,7 +299,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.resultCode").value("403-2"))
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
                 .andExpect(jsonPath("$.msg").value("작성자만 글을 수정할 수 있습니다."))
         ;
     }
@@ -382,8 +382,75 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.resultCode").value("403-2"))
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
                 .andExpect(jsonPath("$.msg").value("작성자만 글을 삭제할 수 있습니다."))
+        ;
+    }
+
+    @Test
+    @DisplayName("비공개글 6번글 조회, with 작성자")
+    void t14() throws Exception {
+        Member actor = memberService.findByUsername("user4").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/posts/6")
+                                .header("Authorization", "Bearer " + actor.getApiKey())
+                )
+                .andDo(print());
+
+        Post post = postService.findById(6).get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("item"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(post.getId()))
+                .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 25))))
+                .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(post.getModifyDate().toString().substring(0, 25))))
+                .andExpect(jsonPath("$.authorId").value(post.getAuthor().getId()))
+                .andExpect(jsonPath("$.authorName").value(post.getAuthor().getName()))
+                .andExpect(jsonPath("$.title").value(post.getTitle()))
+                .andExpect(jsonPath("$.content").value(post.getContent()))
+        ;
+    }
+
+    @Test
+    @DisplayName("비공개글 6번글 조회, with no actor")
+    void t15() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/posts/6")
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("item"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("apiKey를 입력해주세요."))
+        ;
+    }
+
+    @Test
+    @DisplayName("비공개글 6번글 조회, with no permission")
+    void t16() throws Exception {
+        Member actor = memberService.findByUsername("user1").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/posts/6")
+                                .header("Authorization", "Bearer " + actor.getApiKey())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("item"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
+                .andExpect(jsonPath("$.msg").value("비공개글은 작성자만 볼 수 있습니다."))
         ;
     }
 }
