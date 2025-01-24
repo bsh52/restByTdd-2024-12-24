@@ -483,7 +483,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(status().isOk())
         ;
 
-        List<Post> posts = postService.findByListedPaged(true, 1, 3);
+        List<Post> posts = postService.findByListedPaged(true, 1, 3).getContent();
 
         for (int i = 0; i < posts.size(); i++) {
             Post post = posts.get(i);

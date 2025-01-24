@@ -60,11 +60,9 @@ public class PostService {
         return postRepository.findFirstByOrderByIdDesc();
     }
 
-    public List<Post> findByListedPaged(boolean listed, int page, int pagesSize) {
+    public Page<Post> findByListedPaged(boolean listed, int page, int pagesSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pagesSize, Sort.by(Sort.Order.desc("id")));
 
-        Page<Post> postPage = postRepository.findByListed(listed, pageRequest);
-
-        return postPage.getContent();
+        return postRepository.findByListed(listed, pageRequest);
     }
 }

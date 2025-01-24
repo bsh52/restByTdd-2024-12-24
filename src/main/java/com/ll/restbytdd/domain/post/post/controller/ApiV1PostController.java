@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +28,10 @@ public class ApiV1PostController {
     public List<PostDto> items(
             @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize
     ) {
-        List<Post> posts = postService.findByListedPaged(true, page, pageSize);
+        Page<Post> postPage = postService.findByListedPaged(true, page, pageSize);
 
-        return posts.stream()
+        return postPage.getContent()
+                .stream()
                 .map(PostDto::new)
                 .toList();
     }
