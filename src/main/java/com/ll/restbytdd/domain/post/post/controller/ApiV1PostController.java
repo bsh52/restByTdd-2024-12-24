@@ -7,15 +7,13 @@ import com.ll.restbytdd.domain.post.post.entity.Post;
 import com.ll.restbytdd.domain.post.post.service.PostService;
 import com.ll.restbytdd.global.rq.Rq;
 import com.ll.restbytdd.global.rsData.RsData;
+import com.ll.restbytdd.standard.page.dto.PageDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -25,15 +23,13 @@ public class ApiV1PostController {
     private final Rq rq;
 
     @GetMapping
-    public List<PostDto> items(
+    public PageDto<PostDto> items(
             @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize
     ) {
-        Page<Post> postPage = postService.findByListedPaged(true, page, pageSize);
-
-        return postPage.getContent()
-                .stream()
-                .map(PostDto::new)
-                .toList();
+        return new PageDto(
+                postService.findByListedPaged(true, page, pageSize)
+                        .map(PostDto::new)
+        );
     }
 
     @GetMapping("/{id}")
