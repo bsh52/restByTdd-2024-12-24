@@ -473,17 +473,17 @@ public class ApiV1PostControllerTest {
     void t17() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
-                        get("/api/v1/posts")
+                        get("/api/v1/posts?page=1&pageSize=3")
                 )
                 .andDo(print());
-
-        List<Post> posts = postService.findAllByOrderByIdDesc();
 
         resultActions
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("items"))
                 .andExpect(status().isOk())
         ;
+
+        List<Post> posts = postService.findByListedPaged(true, 1, 3);
 
         for (int i = 0; i < posts.size(); i++) {
             Post post = posts.get(i);
