@@ -13,6 +13,8 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+    hikari:
+      auto-commit: false
   jpa:
     open-in-view: false
     hibernate:
